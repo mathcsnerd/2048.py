@@ -1,0 +1,111 @@
+import random
+import os
+import sys
+
+def start_game():
+    grid = [[0] * 4 for _ in range(4)]
+    add_new_tile(grid)
+    add_new_tile(grid)
+    return grid
+
+def add_new_tile(grid):
+    x, y = random.randint(0, 3), random.randint(0, 3)
+    while grid[x][y] != 0:
+        x, y = random.randint(0, 3), random.randint(0, 3)
+    grid[x][y] = 4 if random.random() > 0.9 else 2
+
+def compress(grid):
+    new_grid = [[0] * 4 for _ in range(4)]
+    for i in range(4):
+        pos = 0
+        for j in range(4):
+            if grid[i][j] != 0:
+                new_grid[i][pos] = grid[i][j]
+                pos += 1
+    return new_grid
+
+def merge(grid):
+    for i in range(4):
+        for j in range(3):
+            if grid[i][j] == grid[i][j + 1] and grid[i][j] != 0:
+                grid[i][j] *= 2
+                grid[i][j + 1] = 0
+    return grid
+
+def reverse(grid):
+    new_grid = []
+    for i in range(4):
+        new_grid.append([])
+        for j in range(3, -1, -1):
+            new_grid[i].append(grid[i][j])
+    return new_grid
+
+def transpose(grid):
+    new_grid = []
+    for i in range(4):
+        new_grid.append([grid[j][i] for j in range(4)])
+    return new_grid
+
+def move_left(grid):
+    compressed = compress(grid)
+    merged = merge(compressed)
+    return compress(merged)
+
+def move_right(grid):
+    reversed_grid = reverse(grid)
+    moved_grid = move_left(reversed_grid)
+    return reverse(moved_grid)
+
+def move_up(grid):
+    transposed_grid = transpose(grid)
+    moved_grid = move_left(transposed_grid)
+    return transpose(moved_grid)
+
+def move_down(grid):
+    transposed_grid = transpose(grid)
+    moved_grid = move_right(transposed_grid)
+    return transpose(moved_grid)
+
+def check_game_over(grid):
+    for i in range(4):
+        for j in range(4):
+            if grid[i][j] == 2048:
+                return True
+            if grid[i][j] == 0:
+                return False
+            if j < 3 and grid[i][j] == grid[i][j + 1]:
+                return False
+            if i < 3 and grid[i][j] == grid[i + 1][j]:
+                return False
+    return True
+
+def print_grid(grid):
+    os.system('clear' if os.name == 'posix' else 'cls')
+    for row in grid:
+        print("\t".join(str(num) if num != 0 else "." for num in row))
+        print()
+
+def main():
+    grid = start_game()
+    while True:
+        print_grid(grid)
+        if check_game_over(grid):
+            print("Game Over!")
+            break
+        move = input("Enter move (w/a/s/d): ").strip().lower()
+        if move in ['a', 'd', 'w', 's']:
+            if move == 'a':
+                new_grid = move_left(grid)
+            elif move == 'd':
+                new_grid = move_right(grid)
+            elif move == 'w':
+                new_grid = move_up(grid)
+            elif move == 's':
+                new_grid = move_down(grid)
+
+            if new_grid != grid:
+                grid = new_grid
+                add_new_tile(grid)
+
+if __name__ == "__main__":
+    main()
