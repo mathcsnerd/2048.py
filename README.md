@@ -1,5 +1,5 @@
-2048 Game
-Description
+2048 
+Game Description
 This is a Python implementation of the popular sliding tile puzzle game 2048, where the goal is to combine tiles with the same number to reach the 2048 tile. Players can move tiles up, down, left, or right, and when two tiles with the same number collide, they merge into one tile with double the value.
 
 The game runs in the command-line interface, making it lightweight and easy to play without any external dependencies.
